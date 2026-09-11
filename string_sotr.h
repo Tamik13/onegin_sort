@@ -7,8 +7,6 @@
 #define MATRIX_IND(x, y) (x * size_y)
 #define MANUAL_IND(bytes, arr) ((size_t)arr + bytes * sizeof(char))
 
-const size_t MAX_STR_LEN = 100;
-
 static error_code_e LAST_ERROR_CODE = INIT_VALUE;
 
 error_code_e swap_symbol_by_symbol(char* first_str, char* second_str, const size_t size);

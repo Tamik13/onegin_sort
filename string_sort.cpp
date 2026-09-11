@@ -1,5 +1,7 @@
 #include "string_sotr.h"
 
+const size_t MAX_STR_LEN = 100;
+
 error_code_e swap_symbol_by_symbol(char* first_str, char* second_str, const size_t size) {
     assert(first_str  != NULL);
     assert(second_str != NULL);
@@ -122,6 +124,11 @@ error_code_e selection_sort(char* str_array, const size_t size_x, const size_t s
 
 error_code_e merge_sort(char* str_array, const size_t size_x, const size_t left,  const size_t right) {
     assert(str_array != NULL);
+    assert(right > left);
+
+    if (right - left == 1) {
+        return SUCCESS;
+    }
 
     size_t middle = (left + right) / 2;
 

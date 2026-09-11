@@ -2,15 +2,6 @@
 
 static error_code_e LAST_ERROR_CODE = INIT_VALUE;
 
-error_code_e sum_matrices           (const int* const first_matrix, const int* const second_matrix, int* const result_matrix,   const size_t size_x,       const size_t size_y);
-error_code_e multiplication_matrices(const int* const first_matrix, const int* const second_matrix, int* const result_matrix,   const size_t size_x_first, const size_t size_y_first,
-                                     const size_t size_x_second,    const size_t size_y_second,     const size_t size_x_result, const size_t size_y_result);
-
-error_code_e print_matrix           (int* const matrix, const size_t size_x, const size_t size_y);
-error_code_e print_triangular_matrix(int* const matrix, const size_t size);
-
-error_code_e test_matrix_functions();
-
 error_code_e sum_matrices(const int* const first_matrix, const int* const second_matrix, int* const result_matrix, const size_t size_x, const size_t size_y) {
     assert(first_matrix != NULL);
     assert(second_matrix != NULL);
