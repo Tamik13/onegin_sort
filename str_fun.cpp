@@ -1,5 +1,7 @@
 #include "str_fun.h"
 
+const size_t MAX_STR_LEN = 100;
+
 error_code_e test_my_str_functions() { // TODO БОЛЬШЕ ТЕСТОВ
     const char* str1 = "phisteh";
     const char* str2 = "URAAAAAAAAAAAAAAAA";
@@ -129,6 +131,7 @@ int my_strncmp(const char* lhs, const char* rhs, size_t count) {
 
     return *lhs - *rhs;
 }
+
 
 
 error_code_e print_const_memory() {

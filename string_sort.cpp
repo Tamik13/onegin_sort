@@ -122,9 +122,16 @@ error_code_e selection_sort(char* str_array, const size_t size_x, const size_t s
     return SUCCESS;
 }
 
-error_code_e merge_sort(char* str_array, const size_t size_x, const size_t left,  const size_t right) {
-    assert(str_array != NULL);
+error_code_e merge_sort(void* array, const size_t size_x, const size_t left, const size_t right, comparator cmp) {
+    assert(array != NULL);
     assert(right > left);
+
+    COLOR_TEXT_START(VIOLET);
+    $size_t(left,  " ");
+    $size_t(right, "\n");
+    COLOR_TEXT_END;
+    print_intptr_arr((int**)((char*)array + left * sizeof(size_t)), right - left);
+    // PRINT_STR_ARR((char**)((char*)str_array + left * sizeof(size_t)), right - left);
 
     if (right - left == 1) {
         return SUCCESS;
@@ -132,13 +139,24 @@ error_code_e merge_sort(char* str_array, const size_t size_x, const size_t left,
 
     size_t middle = (left + right) / 2;
 
-    merge_sort(str_array, size_x, left, middle);
-    merge_sort(str_array, size_x, middle, right);
+    merge_sort(array, size_x, left, middle, cmp);
+    merge_sort(array, size_x, middle, right, cmp);
 
-    char*  first_str_array_copy = (char*)calloc(middle - left,  sizeof(size_t));
-    char* second_str_array_copy = (char*)calloc(right - middle, sizeof(size_t));
+    void*  first_str_array_copy = calloc(middle - left,  sizeof(size_t));
+    void* second_str_array_copy = calloc(right - middle, sizeof(size_t));
 
-    merge(first_str_array_copy, middle - left, second_str_array_copy, right - middle, str_array + left, right - left);
+    memcpy(first_str_array_copy,  (void*)((size_t*)array + left),   sizeof(size_t) * (middle - left));
+    memcpy(second_str_array_copy, (void*)((size_t*)array + middle), sizeof(size_t) * (right - middle));
+
+    // $size_t(middle - left, " ");
+    // $size_t(sizeof(first_str_array_copy), "\n");
+
+    // PRINT_STR_ARR((char**)first_str_array_copy,  middle - left);
+    // PRINT_STR_ARR((char**)second_str_array_copy, right - middle);
+
+    merge(first_str_array_copy, middle - left, second_str_array_copy, right - middle, (size_t*)array + left, right - left, cmp);
+
+    // PRINT_STR_ARR((char**)((char*)str_array + left * sizeof(size_t)),  right - left);
 
     free(first_str_array_copy);
     free(second_str_array_copy);
@@ -147,151 +165,220 @@ error_code_e merge_sort(char* str_array, const size_t size_x, const size_t left,
 }
 
 
-error_code_e print_str_matrix(const char* const str_array, const size_t size_x, const size_t size_y) {
-    assert(str_array != NULL);
-
-    for (size_t x = 0; x < size_x; x++) {
-        printf("<%s>\n", &str_array[x * size_y]);
-    }
-
-    return SUCCESS;
-}
-
-
-error_code_e merge(char* first_arr, size_t first_size, char* second_arr, size_t second_size, char* result_arr, size_t result_size) {
+error_code_e merge(const void* const first_arr, size_t first_size, const void* const second_arr, size_t second_size, void* const result_arr, size_t result_size, comparator cmp) {
     assert(first_arr  != NULL);
     assert(second_arr != NULL);
+    assert(first_size + second_size == result_size);
 
     size_t x = 0, y = 0;
+
+    $size_t(first_size, " ");
+    $size_t(second_size, " ");
+    $size_t(result_size, "\n");
+
+    print_intptr_arr((int**)result_arr, result_size);
 
     while (x < first_size && y < second_size) {
         ASSERT_FOR_ARR(x, first_size);
         ASSERT_FOR_ARR(y, second_size);
         ASSERT_FOR_ARR(x + y, result_size);
 
-        int comparison = my_strncmp(&first_arr[x], &second_arr[y], MAX_STR_LEN);
+        $size_t(MANUAL_IND(x + y, sizeof(size_t), result_arr), " ");
+        $size_t(MANUAL_IND(y, sizeof(size_t), second_arr), " ");
+        $size_t(MANUAL_IND(x, sizeof(size_t), first_arr), "\n");
 
-        if (comparison <= 0) {
-            result_arr[x + y] = first_arr[x];
+        int comparison = cmp((void*)MANUAL_IND(x, sizeof(size_t), first_arr), (void*)MANUAL_IND(y, sizeof(size_t), second_arr), MAX_STR_LEN);
+
+        if (comparison >= 0) {
+            memcpy((void*)MANUAL_IND((x + y), sizeof(size_t), result_arr), (void*)MANUAL_IND(x, sizeof(size_t), first_arr), sizeof(size_t));
             x++;
-        } else if (comparison > 0) {
-            result_arr[x + y] = second_arr[y];
+        } else {
+            memcpy((void*)MANUAL_IND((x + y), sizeof(size_t), result_arr), (void*)MANUAL_IND(y, sizeof(size_t), second_arr), sizeof(size_t));
             y++;
         }
+        $size_t(x, " "); $size_t(y, "\n");
     }
 
-    while (x < first_size) {
+    while (x < first_size && x + y < result_size) {
         ASSERT_FOR_ARR(x, first_size);
-        result_arr[x + y] = first_arr[x];
+        ASSERT_FOR_ARR(x + y, result_size);
+
+        $size_t(MANUAL_IND((x + y), sizeof(size_t), result_arr), " ");
+        $size_t(MANUAL_IND(x, sizeof(size_t), first_arr), "\n");
+
+        memcpy((void*)MANUAL_IND((x + y), sizeof(size_t), result_arr), (void*)MANUAL_IND(x, sizeof(size_t), first_arr), sizeof(size_t));
         x++;
+
+        $size_t(x, " "); $size_t(y, "\n");
     }
 
-    while (y < second_size) {
+    while (y < second_size && x + y < result_size) {
         ASSERT_FOR_ARR(y, second_size);
-        result_arr[x + y] = second_arr[y];
-        x++;
+        ASSERT_FOR_ARR(x + y, result_size);
+
+        $size_t(MANUAL_IND((x + y), sizeof(size_t), result_arr), " ");
+        $size_t(MANUAL_IND(y, sizeof(size_t), second_arr), "\n");
+
+        memcpy((void*)MANUAL_IND((x + y), sizeof(size_t), result_arr), (void*)MANUAL_IND(y, sizeof(size_t), second_arr), sizeof(size_t));
+        y++;
+
+        $size_t(x, " "); $size_t(y, "\n");
+    }
+
+    // printf("%d\n", (*(int**)result_arr)[0]);
+    print_intptr_arr((int**)result_arr, result_size);
+
+    printf("URA\n");
+
+    return SUCCESS;
+}
+
+error_code_e assignment(void* const lhs, void* const rhs, const size_t size, const size_t size_type) {
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    size_t num_block = 0;
+
+    switch (size_type) {
+        case sizeof(uint64_t):
+            ASSIGN_BLOCK(uint64_t);
+            break;
+        case sizeof(uint32_t):
+            ASSIGN_BLOCK(uint32_t);
+            break;
+        case sizeof(uint16_t):
+            ASSIGN_BLOCK(uint16_t);
+            break;
+        case sizeof(uint8_t):
+            ASSIGN_BLOCK(uint8_t);
+            break;
+        default:
+            return UNDEFINED_TYPE;
     }
 
     return SUCCESS;
 }
 
+int str_cmp(void* const first_element, void* const second_element, const size_t size) {
+    assert(first_element  != NULL);
+    assert(second_element != NULL);
 
-error_code_e test_bubble_sort() {
-    const size_t size1_x = 5;
-
-    char str_array1[size1_x][MAX_STR_LEN] = {
-        "BCDE",
-        "ABCD",
-        "HELLO",
-        "a",
-        "AAAA"
-    };
-
-    if ((LAST_ERROR_CODE = bubble_sort((char*)str_array1, size1_x, MAX_STR_LEN)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
-
-    if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array1, size1_x, MAX_STR_LEN)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
-
-    printf("\n\n");
-
-    const size_t size2_x = 11;
-
-    char str_array2[size2_x][MAX_STR_LEN] = {
-        "a",      // 1
-        "\0\0\0", // 2
-        "ZZZZZZ", // 3
-        "8",      // 4
-        "910",    // 5
-        "1",      // 6
-        "2",      // 7
-        "6",      // 8
-        "4",      // 9
-        "3",      // 10
-        ""
-    };
-
-    if ((LAST_ERROR_CODE = bubble_sort((char*)str_array2, size2_x, MAX_STR_LEN)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
-
-    if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array2, size2_x, MAX_STR_LEN)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
-
-    return SUCCESS;
+    return strncmp((char*)first_element, (char*)second_element, size);
 }
 
+int int_cmp(void* const first_element, void* const second_element, const size_t size) {
+    assert(first_element  != NULL);
+    assert(second_element != NULL);
 
-error_code_e test_selection_sort() {
-    const size_t size_x = 5;
-
-    char str_array[size_x][MAX_STR_LEN] = {
-        "BCDE",
-        "ABCD",
-        "HELLO",
-        "a",
-        "AAAA"
-    };
-
-    if ((LAST_ERROR_CODE = selection_sort((char*)str_array, size_x, MAX_STR_LEN)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
-
-    if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array, size_x, MAX_STR_LEN)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
-
-    return SUCCESS;
+    return *(int*)first_element - *(int*)second_element;
 }
+
+// error_code_e test_bubble_sort() {
+//     const size_t size1_x = 5;
+//
+//     char str_array1[size1_x][MAX_STR_LEN] = {
+//         "BCDE",
+//         "ABCD",
+//         "HELLO",
+//         "a",
+//         "AAAA"
+//     };
+//
+//     if ((LAST_ERROR_CODE = bubble_sort((char*)str_array1, size1_x, MAX_STR_LEN)) != SUCCESS) {
+//         PRINT_ERROR;
+//         return LAST_ERROR_CODE;
+//     }
+//
+//     if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array1, size1_x, MAX_STR_LEN)) != SUCCESS) {
+//         PRINT_ERROR;
+//         return LAST_ERROR_CODE;
+//     }
+//
+//     printf("\n\n");
+//
+//     const size_t size2_x = 11;
+//
+//     char str_array2[size2_x][MAX_STR_LEN] = {
+//         "a",      // 1
+//         "\0\0\0", // 2
+//         "ZZZZZZ", // 3
+//         "8",      // 4
+//         "910",    // 5
+//         "1",      // 6
+//         "2",      // 7
+//         "6",      // 8
+//         "4",      // 9
+//         "3",      // 10
+//         ""
+//     };
+//
+//     if ((LAST_ERROR_CODE = bubble_sort((char*)str_array2, size2_x, MAX_STR_LEN)) != SUCCESS) {
+//         PRINT_ERROR;
+//         return LAST_ERROR_CODE;
+//     }
+//
+//     if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array2, size2_x, MAX_STR_LEN)) != SUCCESS) {
+//         PRINT_ERROR;
+//         return LAST_ERROR_CODE;
+//     }
+//
+//     return SUCCESS;
+// }
+
+
+// error_code_e test_selection_sort() {
+//     const size_t size_x = 5;
+//
+//     char str_array[size_x][MAX_STR_LEN] = {
+//         "BCDE",
+//         "ABCD",
+//         "HELLO",
+//         "a",
+//         "AAAA"
+//     };
+//
+//     if ((LAST_ERROR_CODE = selection_sort((char*)str_array, size_x, MAX_STR_LEN)) != SUCCESS) {
+//         PRINT_ERROR;
+//         return LAST_ERROR_CODE;
+//     }
+//
+//     if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array, size_x, MAX_STR_LEN)) != SUCCESS) {
+//         PRINT_ERROR;
+//         return LAST_ERROR_CODE;
+//     }
+//
+//     return SUCCESS;
+// }
 
 error_code_e test_merge_sort() {
-    const size_t size1_x = 3;
+    const size_t size = 3;
 
-    const char* const str1 = "BCDE";
-    const char* const str2 = "ABCDE";
-    const char* const str3 = "Z";
+    char* const str1 = "BCDE";
+    char* const str2 = "ABCDE";
+    char* const str3 = "Z";
 
-    const char* str_array1[size1_x] = {
+    char* str_array[size] = {
         str1,
         str2,
         str3
     };
 
-    if ((LAST_ERROR_CODE = merge_sort((char*)str_array1, size1_x, 0, size1_x)) != SUCCESS) {
+    int num1 = 4;
+    int num2 = 7;
+    int num3 = 6;
+
+    int* int_array[size] = {
+        &num1,
+        &num2,
+        &num3
+    };
+
+    if ((LAST_ERROR_CODE = merge_sort((void*)int_array, size, 0, size, int_cmp)) != SUCCESS) {
         PRINT_ERROR;
         return LAST_ERROR_CODE;
     }
 
-    if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array1, size1_x, MAX_STR_LEN)) != SUCCESS) {
+    if ((LAST_ERROR_CODE = print_intptr_arr(int_array, size)) != SUCCESS) {
         PRINT_ERROR;
         return LAST_ERROR_CODE;
     }
