@@ -6,7 +6,7 @@
 // error_code_e get_random_int ();
 // error_code_e get_random_char();
 
-error_code_e print_arr(void* const arr, const size_t size, const size_t size_type, const char* const type, const char* const message) {
+error_code_e print_arr(const void* const arr, const size_t size, const size_t size_type, const char* const type, const char* const message) {
     assert(arr != NULL);
 
     printf(COLOR_TEXT("%s", VIOLET), message);
@@ -23,7 +23,7 @@ error_code_e print_arr(void* const arr, const size_t size, const size_t size_typ
     return SUCCESS;
 }
 
-error_code_e print_str_matrix(char* const arr[], const size_t size) {
+error_code_e print_str_matrix(const char* const arr[], const size_t size) {
     assert(arr != NULL);
 
     for (size_t block_ind = 0; block_ind < size; block_ind++) {
@@ -58,15 +58,23 @@ error_code_e print_int_matrix(const int int_array[], const size_t size_x, const 
     return SUCCESS;
 }
 
-error_code_e print_intptr_arr(int* int_array[], const size_t size) {
+error_code_e print_intptr_arr(const int* const int_array[], const size_t size) {
     assert(int_array != NULL);
+
+    $ANCHOR
+
+    PRINT_PTR_ARR(int_array, size);
 
     for (size_t x = 0; x < size; x++) {
         ASSERT_FOR_ARR(x, size);
+
+        $ANCHOR
         printf("%d ", *int_array[x]);
     }
     printf("\n");
 
     return SUCCESS;
 }
+
+
 
