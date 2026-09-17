@@ -125,42 +125,38 @@ error_code_e selection_sort(char* str_array, const size_t size_x, const size_t s
 error_code_e merge_sort(void* const array, const size_t size, comparator cmp) {
     assert(array != NULL);
 
+    $START_FUNCTION
+
     if (size <= 1) {
         return SUCCESS;
     }
 
-    PRINT_PTR_ARR(array, size);
-    $ANCHOR
+    // $PRINT_PTR_ARR(array, size);
+    $ptr(array);
+
 
     size_t middle = size / 2;
 
-    void* left_array  = (char*)array;
-    void* right_array = (char*)array + middle;
+    void* left_array  = (void**)array;
+    void* right_array = (void**)array + middle;
+
+    $ptr(left_array);
+    $ptr(right_array);
 
     const size_t left_size  = middle;
     const size_t right_size = size - middle;
 
-    merge_sort(left_array,  left_size, cmp);
-    merge_sort(left_array, right_size,  cmp);
+    $size_t(middle);
+    $size_t(size - middle);
 
-    $ANCHOR
+    merge_sort(left_array,  left_size,  cmp);
+    merge_sort(right_array, right_size,  cmp);
 
-    void* const left_array_copy  = calloc(middle,         sizeof(size_t));
-    void* const right_array_copy = calloc(size - middle, sizeof(size_t));
+    merge(left_array, left_size, right_array, right_size, array, size, cmp);
 
-    memcpy(left_array_copy,  left_array,  left_size);
-    memcpy(right_array_copy, right_array, right_size);
+    $PRINT_INTPTR_ARR(array, size);
 
-    $ANCHOR
-
-    merge(left_array_copy, left_size, right_array_copy, right_size, array, size, cmp);
-
-    $ANCHOR
-
-    free(left_array_copy);
-    free(right_array_copy);
-
-    $ANCHOR
+    $END_FUNCTION;
 
     return SUCCESS;
 }
@@ -171,13 +167,28 @@ error_code_e merge(const void* const first_arr, const size_t first_size, const v
     assert(second_arr != NULL);
     assert(first_size + second_size == result_size);
 
-    $ANCHOR
+    $START_FUNCTION
 
-    PRINT_PTR_ARR(first_arr, first_size);
-    PRINT_PTR_ARR(second_arr, second_size);
-    PRINT_PTR_ARR(result_arr, result_size);
 
-    $ANCHOR
+    // PRINT_PTR_ARR(first_arr, first_size);
+    // PRINT_PTR_ARR(second_arr, second_size);
+    // PRINT_PTR_ARR(result_arr, result_size);
+
+
+
+    void* const first_arr_copy  = calloc(first_size,  sizeof(size_t));
+    void* const second_arr_copy = calloc(second_size, sizeof(size_t));
+
+    memcpy(first_arr_copy,  first_arr,  first_size  * sizeof(size_t));
+    memcpy(second_arr_copy, second_arr, second_size * sizeof(size_t));
+
+    $PRINT_INTPTR_ARR(first_arr_copy, first_size);
+    $PRINT_INTPTR_ARR(second_arr_copy, second_size);
+
+
+
+    // PRINT_PTR_ARR(first_arr_copy, first_size);
+    // PRINT_PTR_ARR(second_arr_copy, second_size);
 
     size_t first_ind = 0, second_ind = 0;
 
@@ -186,15 +197,19 @@ error_code_e merge(const void* const first_arr, const size_t first_size, const v
         ASSERT_FOR_ARR(second_ind, second_size);
         ASSERT_FOR_ARR(first_ind + second_ind, result_arr);
 
-        $ANCHOR
 
-        int comparison = cmp((const void* const)((const size_t* const)first_arr + first_ind), (const void* const)((const size_t* const)second_arr + second_ind), sizeof(size_t));
 
-        if (comparison <= 0) {
-            memcpy(MANUAL_IND((first_ind + second_ind) * sizeof(size_t), result_arr), MANUAL_IND(first_ind * sizeof(size_t), first_arr), sizeof(size_t));
+        int comparison = cmp((const void* const)*((const size_t* const)first_arr_copy + first_ind), (const void* const)*((const size_t* const)second_arr_copy + second_ind), sizeof(size_t));
+
+        $int(comparison);
+        $int(*(int*)*((const size_t* const)first_arr_copy  +  first_ind));
+        $int(*(int*)*((const size_t* const)second_arr_copy + second_ind));
+
+        if (comparison < 0) {
+            memcpy(MANUAL_IND((first_ind + second_ind) * sizeof(size_t), result_arr), MANUAL_IND(first_ind * sizeof(size_t), first_arr_copy), sizeof(size_t));
             first_ind++;
         } else {
-            memcpy(MANUAL_IND((first_ind + second_ind) * sizeof(size_t), result_arr), MANUAL_IND(second_ind * sizeof(size_t), second_arr), sizeof(size_t));
+            memcpy(MANUAL_IND((first_ind + second_ind) * sizeof(size_t), result_arr), MANUAL_IND(second_ind * sizeof(size_t), second_arr_copy), sizeof(size_t));
             second_ind++;
         }
     }
@@ -203,9 +218,9 @@ error_code_e merge(const void* const first_arr, const size_t first_size, const v
         ASSERT_FOR_ARR(first_ind,  first_size);
         ASSERT_FOR_ARR(first_ind + second_ind, result_arr);
 
-        $ANCHOR
 
-        memcpy(MANUAL_IND((first_ind + second_ind) * sizeof(size_t), result_arr), MANUAL_IND(first_ind * sizeof(size_t), first_arr), sizeof(size_t));
+
+        memcpy(MANUAL_IND((first_ind + second_ind) * sizeof(size_t), result_arr), MANUAL_IND(first_ind * sizeof(size_t), first_arr_copy), sizeof(size_t));
         first_ind++;
     }
 
@@ -213,13 +228,27 @@ error_code_e merge(const void* const first_arr, const size_t first_size, const v
         ASSERT_FOR_ARR(second_ind, second_size);
         ASSERT_FOR_ARR(first_ind + second_ind, result_arr);
 
-        $ANCHOR
 
-        memcpy(MANUAL_IND((first_ind + second_ind) * sizeof(size_t), result_arr), MANUAL_IND(second_ind * sizeof(size_t), second_arr), sizeof(size_t));
+
+        memcpy(MANUAL_IND((first_ind + second_ind) * sizeof(size_t), result_arr), MANUAL_IND(second_ind * sizeof(size_t), second_arr_copy), sizeof(size_t));
         second_ind++;
     }
 
-    $ANCHOR
+
+    $PRINT_INTPTR_ARR(result_arr, result_size);
+    $PRINT_INTPTR_ARR(first_arr_copy, first_size);
+    $PRINT_INTPTR_ARR(second_arr_copy, second_size);
+
+    // PRINT_PTR_ARR(first_arr_copy, first_size);
+    // PRINT_PTR_ARR(second_arr_copy, second_size);
+    // PRINT_PTR_ARR(result_arr, result_size);
+
+
+
+    free(first_arr_copy);
+    free(second_arr_copy);
+
+    $END_FUNCTION
 
     return SUCCESS;
 }
@@ -263,23 +292,23 @@ error_code_e test_merge_sort() {
         &num3
     };
 
-    $ANCHOR
 
-    PRINT_PTR_ARR(int_array, size);
+
+    $PRINT_PTR_ARR(int_array, size);
 
     if ((LAST_ERROR_CODE = merge_sort((void*)int_array, size, int_cmp)) != SUCCESS) {
         PRINT_ERROR;
         return LAST_ERROR_CODE;
     }
 
-    $ANCHOR;
+    ;
 
     if ((LAST_ERROR_CODE = print_intptr_arr(int_array, size)) != SUCCESS) {
         PRINT_ERROR;
         return LAST_ERROR_CODE;
     }
 
-    $ANCHOR
+
 
     return SUCCESS;
 }

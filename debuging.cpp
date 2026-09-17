@@ -6,22 +6,6 @@
 // error_code_e get_random_int ();
 // error_code_e get_random_char();
 
-error_code_e print_arr(const void* const arr, const size_t size, const size_t size_type, const char* const type, const char* const message) {
-    assert(arr != NULL);
-
-    printf(COLOR_TEXT("%s", VIOLET), message);
-
-    size_t block_ind = 0;
-
-    while (block_ind < size) {
-        ASSERT_FOR_ARR(block_ind, size);
-        printf(type, (char*)arr + size_type * block_ind);
-        printf(" ");
-        block_ind++;
-    }
-
-    return SUCCESS;
-}
 
 error_code_e print_str_matrix(const char* const arr[], const size_t size) {
     assert(arr != NULL);
@@ -61,14 +45,13 @@ error_code_e print_int_matrix(const int int_array[], const size_t size_x, const 
 error_code_e print_intptr_arr(const int* const int_array[], const size_t size) {
     assert(int_array != NULL);
 
-    $ANCHOR
+    // $ANCHOR
 
-    PRINT_PTR_ARR(int_array, size);
+    // PRINT_PTR_ARR(int_array, size);
 
     for (size_t x = 0; x < size; x++) {
         ASSERT_FOR_ARR(x, size);
 
-        $ANCHOR
         printf("%d ", *int_array[x]);
     }
     printf("\n");
