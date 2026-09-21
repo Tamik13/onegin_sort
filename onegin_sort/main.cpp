@@ -53,10 +53,14 @@ int main() {
 //         PRINT_ERROR;
 //         return LAST_ERROR_CODE;
 //     }
-    const size_t size = 10;
+    const size_t size = 20;
     int array[size] = {1, 4, 10, 3, 7, 6, 2, 8, 9, 5};
 
-    q_sort(array, size);
+    $ANCHOR
+
+    q_sort(array, size, sizeof(int), int_cmp);
+
+    $print_int_arr(array, size);
 
     return 0;
 }

@@ -133,53 +133,59 @@ error_code_e selection_sort(char* str_array, const size_t size_x, const size_t s
     return SUCCESS;
 }
 
-error_code_e q_sort(int* const array, const size_t size) {
+error_code_e q_sort(void* const array, const size_t size, const size_t type_size, comparator cmp) {
     assert(array != NULL);
-    // assert(size  != 0);
 
-    $START_FUNCTION;
+    $START_FUNCTION
 
     if (size <= 1) {
         $END_FUNCTION
         return SUCCESS;
     }
 
-    size_t left   = 0;
-    size_t right  = size - 1;
-    size_t middle_el = array[size / 2];
+    size_t left     = 0;
+    size_t right    = size - 1;
+    void* const middle_el = calloc(1, type_size);
+    memcpy(middle_el, (char*)array + (size / 2) * type_size, type_size);
+
+    // $ANCHOR
 
     while (left < right) {
 
-        while (left <= right && array[left] < middle_el) {
+        while (left <= right && cmp(((char*)array + left * type_size), middle_el) < 0) {
             left++;
             $DEBUG_QSORT
         }
 
-        while (left <= right && middle_el   < array[right]) {
+        // $ANCHOR
+
+        while (left <= right && cmp(middle_el, ((char*)array + right * type_size)) < 0) {
             right--;
             $DEBUG_QSORT
         }
 
+        // $ANCHOR
+
         if (left < right) {
-            swap_with_ll_buffer((char*)&array[left], (char*)&array[right], sizeof(int));
+            swap_with_ll_buffer(((char*)array + left * type_size), ((char*)array + right * type_size), type_size);
             left++;
-            $ANCHOR
             $DEBUG_QSORT
+
+            // $ANCHOR
 
             if (left < right) {
                 right--;
                 $DEBUG_QSORT
             }
         }
-
     }
-    $DEBUG_QSORT
 
-    q_sort(array, left);
-    $DEBUG_QSORT
-    q_sort(array + left, size - left);
+    if (left > 0 && cmp(((char*)array + left * type_size), middle_el) < 0) {
+        left++;
+    }
 
-    $DEBUG_QSORT
+    q_sort(array, left, type_size, cmp);
+    q_sort((char*)array + left * type_size, size - left, type_size, cmp);
 
     $END_FUNCTION
 

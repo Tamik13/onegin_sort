@@ -44,27 +44,27 @@
                                                                                                     \
     fprintf(stderr, "\n");
 
-#define $DEBUG_QSORT                                            \
+#define $DEBUG_QSORT                                                        \
     for (size_t num_ind = 0; num_ind < MIN(left, right); num_ind++) {       \
-        ASSERT_FOR_ARR(num_ind, size);                          \
-                                                                \
-        printf(COLOR_TEXT("%4d ", BLUE), array[num_ind]);       \
+        ASSERT_FOR_ARR(num_ind, size);                                      \
+                                                                            \
+        printf(COLOR_TEXT("%4d ", BLUE), *(int*)((char*)array + num_ind * type_size));       \
     }                                                           \
                                                                 \
-    for (size_t num_ind = left; num_ind <= right; num_ind++) {   \
+    for (size_t num_ind = left; num_ind <= right; num_ind++) {  \
         ASSERT_FOR_ARR(num_ind, size);                          \
                                                                 \
-        printf("%4d ", array[num_ind]);                         \
-    }                                                           \
-                                                                \
+        printf("%4d ", *(int*)((char*)array + num_ind * type_size));                         \
+    }                                                               \
+                                                                    \
     for (size_t num_ind = right + 1; num_ind < size; num_ind++) {   \
         ASSERT_FOR_ARR(num_ind, size);                              \
                                                                     \
-        printf(COLOR_TEXT("%4d ", RED), array[num_ind]);            \
+        printf(COLOR_TEXT("%4d ", RED), *(int*)((char*)array + num_ind * type_size));            \
     }                                                               \
                                                                     \
                                                                     \
-    printf(COLOR_TEXT(" left = %zu right = %zu middle_el = %zu" ,VIOLET) "\n\n", left, right, middle_el); \
+    printf(COLOR_TEXT(" left = %zu right = %zu middle_el = %d" ,VIOLET) "\n\n", left, right, *(int*)middle_el); \
     getchar();                                                   \
 
 #define RED    "91"

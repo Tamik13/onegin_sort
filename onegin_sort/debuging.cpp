@@ -33,8 +33,9 @@ void $print_int_arr(const int int_array[], const size_t size) {
 
     for (size_t x = 0; x < size; x++) {
         ASSERT_FOR_ARR(x, size);
-        printf("%d", int_array[x]);
+        printf("%d ", int_array[x]);
     }
+    printf("\n");
 }
 
 
