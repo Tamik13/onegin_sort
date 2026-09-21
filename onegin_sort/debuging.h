@@ -44,6 +44,29 @@
                                                                                                     \
     fprintf(stderr, "\n");
 
+#define $DEBUG_QSORT                                            \
+    for (size_t num_ind = 0; num_ind < MIN(left, right); num_ind++) {       \
+        ASSERT_FOR_ARR(num_ind, size);                          \
+                                                                \
+        printf(COLOR_TEXT("%4d ", BLUE), array[num_ind]);       \
+    }                                                           \
+                                                                \
+    for (size_t num_ind = left; num_ind <= right; num_ind++) {   \
+        ASSERT_FOR_ARR(num_ind, size);                          \
+                                                                \
+        printf("%4d ", array[num_ind]);                         \
+    }                                                           \
+                                                                \
+    for (size_t num_ind = right + 1; num_ind < size; num_ind++) {   \
+        ASSERT_FOR_ARR(num_ind, size);                              \
+                                                                    \
+        printf(COLOR_TEXT("%4d ", RED), array[num_ind]);            \
+    }                                                               \
+                                                                    \
+                                                                    \
+    printf(COLOR_TEXT(" left = %zu right = %zu middle_el = %zu" ,VIOLET) "\n\n", left, right, middle_el); \
+    getchar();                                                   \
+
 #define RED    "91"
 #define GREEN  "92"
 #define BLUE   "94"
@@ -74,11 +97,12 @@ enum error_code_e {
     STAT_READ_ERROR          = 7,
     ERROR_DURING_READING     = 8,
     ERROR_IN_MEM_ALLOCATION  = 9,
+    ERROR_DURING_WRITING     = 10,
     INIT_VALUE               = -1
 };
 
-error_code_e print_arr       (const void* const arr,        const size_t size,   const size_t size_type, const char* const type, const char* const message);
-error_code_e print_strptr_arr(const char* const arr[],      const size_t size);
-error_code_e print_str_matrix(const char* const arr,       const size_t size_x, const size_t size_y);
-error_code_e print_int_arr   (const int int_array[],        const size_t size);
-error_code_e print_intptr_arr(const int* const int_array[], const size_t size);
+void $print_arr       (const void* const arr,        const size_t size,   const size_t size_type, const char* const type, const char* const message);
+void $print_strptr_arr(const char* const arr[],      const size_t size);
+void $print_str_matrix(const char* const arr,       const size_t size_x, const size_t size_y);
+void $print_int_arr   (const int int_array[],        const size_t size);
+void $print_intptr_arr(const int* const int_array[], const size_t size);

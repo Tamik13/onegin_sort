@@ -3,10 +3,16 @@
 #include <string.h>
 #include "debuging.h"
 
-#define MIN(x, y) (x < y) ? x : y
-#define LEN(arr) sizeof(arr) / sizeof(arr[0]) // Писать только в функции где массив инициализируется
+#define MIN(x, y)   ((x < y) ? x : y)
+#define LEN(arr)    sizeof(arr) / sizeof(arr[0]) // Писать только в функции где массив инициализируется
+#define NO_STR(str) #str
 
 error_code_e test_my_str_functions();
+
+struct string {
+    size_t text_sz = 0;
+    char* text;
+};
 
 size_t my_strnlen   (const char* str, size_t max_size);
 error_code_e my_puts(const char* str);

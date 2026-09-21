@@ -133,6 +133,59 @@ error_code_e selection_sort(char* str_array, const size_t size_x, const size_t s
     return SUCCESS;
 }
 
+error_code_e q_sort(int* const array, const size_t size) {
+    assert(array != NULL);
+    // assert(size  != 0);
+
+    $START_FUNCTION;
+
+    if (size <= 1) {
+        $END_FUNCTION
+        return SUCCESS;
+    }
+
+    size_t left   = 0;
+    size_t right  = size - 1;
+    size_t middle_el = array[size / 2];
+
+    while (left < right) {
+
+        while (left <= right && array[left] < middle_el) {
+            left++;
+            $DEBUG_QSORT
+        }
+
+        while (left <= right && middle_el   < array[right]) {
+            right--;
+            $DEBUG_QSORT
+        }
+
+        if (left < right) {
+            swap_with_ll_buffer((char*)&array[left], (char*)&array[right], sizeof(int));
+            left++;
+            $ANCHOR
+            $DEBUG_QSORT
+
+            if (left < right) {
+                right--;
+                $DEBUG_QSORT
+            }
+        }
+
+    }
+    $DEBUG_QSORT
+
+    q_sort(array, left);
+    $DEBUG_QSORT
+    q_sort(array + left, size - left);
+
+    $DEBUG_QSORT
+
+    $END_FUNCTION
+
+    return SUCCESS;
+}
+
 
 error_code_e merge_sort(void* const array, const size_t size, comparator cmp) {
     assert(array != NULL);
@@ -186,7 +239,11 @@ error_code_e merge(const void* const first_arr, const size_t first_size, const v
         const void* const first_element  = (const void* const)*((const size_t* const)first_element_ptr);
         const void* const second_element = (const void* const)*((const size_t* const)second_element_ptr);
 
-        int comparison = cmp(first_element, second_element, sizeof(size_t));
+        $ANCHOR
+
+        int comparison = cmp(first_element, second_element);
+
+        $ANCHOR
 
         if (comparison < 0) {
             memcpy(result_element_ptr, second_element_ptr, sizeof(size_t));
@@ -220,15 +277,15 @@ error_code_e merge(const void* const first_arr, const size_t first_size, const v
 }
 
 
-int str_cmp(const void* const first_element, const void* const second_element, const size_t size) {
-    assert(first_element  != NULL);
-    assert(second_element != NULL);
+int string_cmp(const void* const first_str, const void* const second_str) {
+    assert( first_str != NULL);
+    assert(second_str != NULL);
 
-    return strncmp((const char* const)first_element, (const char* const)second_element, size);
+    return my_strncmp(((string*)first_str)->text, ((string*)second_str)->text, MIN(((string*)first_str)->text_sz, ((string*)second_str)->text_sz));
 }
 
 
-int int_cmp(const void* const first_element, const void* const second_element, const size_t size) {
+int int_cmp(const void* const first_element, const void* const second_element) {
     assert(first_element  != NULL);
     assert(second_element != NULL);
 
@@ -252,10 +309,10 @@ error_code_e test_bubble_sort() {
         return LAST_ERROR_CODE;
     }
 
-    if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array1, size1_x, MAX_STR_LEN)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
+    // if ((LAST_ERROR_CODE = $print_str_matrix((char*)str_array1, size1_x, MAX_STR_LEN)) != SUCCESS) {
+    //     PRINT_ERROR;
+    //     return LAST_ERROR_CODE;
+    // }
 
     printf("\n\n");
 
@@ -280,10 +337,10 @@ error_code_e test_bubble_sort() {
         return LAST_ERROR_CODE;
     }
 
-    if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array2, size2_x, MAX_STR_LEN)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
+    // if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array2, size2_x, MAX_STR_LEN)) != SUCCESS) {
+    //     PRINT_ERROR;
+    //     return LAST_ERROR_CODE;
+    // }
 
     return SUCCESS;
 }
@@ -305,10 +362,10 @@ error_code_e test_selection_sort() {
         return LAST_ERROR_CODE;
     }
 
-    if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array, size_x, MAX_STR_LEN)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
+    // if ((LAST_ERROR_CODE = print_str_matrix((char*)str_array, size_x, MAX_STR_LEN)) != SUCCESS) {
+    //     PRINT_ERROR;
+    //     return LAST_ERROR_CODE;
+    // }
 
     return SUCCESS;
 }
@@ -343,15 +400,15 @@ error_code_e test_merge_sort() {
         str11
     };
 
-    if ((LAST_ERROR_CODE = merge_sort((void*)str_array, size, str_cmp)) != SUCCESS) {
+    if ((LAST_ERROR_CODE = merge_sort((void*)str_array, size, string_cmp)) != SUCCESS) {
         PRINT_ERROR;
         return LAST_ERROR_CODE;
     }
 
-    if ((LAST_ERROR_CODE = print_strptr_arr(str_array, size)) != SUCCESS) {
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
+    // if ((LAST_ERROR_CODE = print_strptr_arr(str_array, size)) != SUCCESS) {
+    //     PRINT_ERROR;
+    //     return LAST_ERROR_CODE;
+    // }
 
     return SUCCESS;
 }
