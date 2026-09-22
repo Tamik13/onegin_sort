@@ -44,28 +44,8 @@
                                                                                                     \
     fprintf(stderr, "\n");
 
-#define $DEBUG_QSORT                                                        \
-    for (size_t num_ind = 0; num_ind < MIN(left, right); num_ind++) {       \
-        ASSERT_FOR_ARR(num_ind, size);                                      \
-                                                                            \
-        printf(COLOR_TEXT("%4d ", BLUE), *(int*)((char*)array + num_ind * type_size));       \
-    }                                                           \
-                                                                \
-    for (size_t num_ind = left; num_ind <= right; num_ind++) {  \
-        ASSERT_FOR_ARR(num_ind, size);                          \
-                                                                \
-        printf("%4d ", *(int*)((char*)array + num_ind * type_size));                         \
-    }                                                               \
-                                                                    \
-    for (size_t num_ind = right + 1; num_ind < size; num_ind++) {   \
-        ASSERT_FOR_ARR(num_ind, size);                              \
-                                                                    \
-        printf(COLOR_TEXT("%4d ", RED), *(int*)((char*)array + num_ind * type_size));            \
-    }                                                               \
-                                                                    \
-                                                                    \
-    printf(COLOR_TEXT(" left = %zu right = %zu middle_el = %d" ,VIOLET) "\n\n", left, right, *(int*)middle_el); \
-    getchar();                                                   \
+#define $DEBUG_QSORT(reason) $debug_qsort((int*)array, size, left, right, middle_el, type_size, reason);
+
 
 #define RED    "91"
 #define GREEN  "92"
@@ -98,11 +78,13 @@ enum error_code_e {
     ERROR_DURING_READING     = 8,
     ERROR_IN_MEM_ALLOCATION  = 9,
     ERROR_DURING_WRITING     = 10,
+    INCORRECT_ARGC           = 11,
     INIT_VALUE               = -1
 };
 
+void $debug_qsort     (const int* array,             const size_t size,   const size_t left,      const size_t right,     void* middle_el,           size_t type_size, const char* const reason);
 void $print_arr       (const void* const arr,        const size_t size,   const size_t size_type, const char* const type, const char* const message);
 void $print_strptr_arr(const char* const arr[],      const size_t size);
-void $print_str_matrix(const char* const arr,       const size_t size_x, const size_t size_y);
+void $print_str_matrix(const char* const arr,        const size_t size_x, const size_t size_y);
 void $print_int_arr   (const int int_array[],        const size_t size);
 void $print_intptr_arr(const int* const int_array[], const size_t size);

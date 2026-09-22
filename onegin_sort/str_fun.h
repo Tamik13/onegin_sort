@@ -5,7 +5,7 @@
 
 #define MIN(x, y)   ((x < y) ? x : y)
 #define LEN(arr)    sizeof(arr) / sizeof(arr[0]) // Писать только в функции где массив инициализируется
-#define NO_STR(str) #str
+#define TO_STR(str) #str
 
 error_code_e test_my_str_functions();
 

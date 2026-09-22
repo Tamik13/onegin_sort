@@ -18,7 +18,6 @@ error_code_e swap_symbol_by_symbol(char* first_str, char* second_str, const size
     return SUCCESS;
 }
 
-
 error_code_e swap_all_strings(char* first_str, char* second_str, const size_t size) {
     assert(first_str  != NULL);
     assert(second_str != NULL);
@@ -44,7 +43,6 @@ error_code_e swap_all_strings(char* first_str, char* second_str, const size_t si
 
     return SUCCESS;
 }
-
 
 error_code_e swap_with_ll_buffer(char* first_str, char* second_str, const size_t size) {
     assert(first_str  != NULL);
@@ -116,7 +114,6 @@ error_code_e bubble_sort(char* str_array, const size_t size_x, const size_t size
     return SUCCESS;
 }
 
-
 error_code_e selection_sort(char* str_array, const size_t size_x, const size_t size_y) {
     assert(str_array != NULL);
 
@@ -134,12 +131,16 @@ error_code_e selection_sort(char* str_array, const size_t size_x, const size_t s
 }
 
 error_code_e q_sort(void* const array, const size_t size, const size_t type_size, comparator cmp) {
-    assert(array != NULL);
+    if (array == NULL) {
+        LAST_ERROR_CODE = ERROR_IN_INPUT_PARAM;
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
 
-    $START_FUNCTION
+    // $START_FUNCTION
 
     if (size <= 1) {
-        $END_FUNCTION
+        // $END_FUNCTION
         return SUCCESS;
     }
 
@@ -154,14 +155,14 @@ error_code_e q_sort(void* const array, const size_t size, const size_t type_size
 
         while (left <= right && cmp(((char*)array + left * type_size), middle_el) < 0) {
             left++;
-            $DEBUG_QSORT
+            // $DEBUG_QSORT("find left ind")
         }
 
         // $ANCHOR
 
         while (left <= right && cmp(middle_el, ((char*)array + right * type_size)) < 0) {
             right--;
-            $DEBUG_QSORT
+            // $DEBUG_QSORT("find right ind")
         }
 
         // $ANCHOR
@@ -169,13 +170,14 @@ error_code_e q_sort(void* const array, const size_t size, const size_t type_size
         if (left < right) {
             swap_with_ll_buffer(((char*)array + left * type_size), ((char*)array + right * type_size), type_size);
             left++;
-            $DEBUG_QSORT
+            // $DEBUG_QSORT("swap buffer LEFT")
 
             // $ANCHOR
 
             if (left < right) {
                 right--;
-                $DEBUG_QSORT
+
+                // $DEBUG_QSORT("swap buffer RIGHT")
             }
         }
     }
@@ -187,11 +189,10 @@ error_code_e q_sort(void* const array, const size_t size, const size_t type_size
     q_sort(array, left, type_size, cmp);
     q_sort((char*)array + left * type_size, size - left, type_size, cmp);
 
-    $END_FUNCTION
+    // $END_FUNCTION
 
     return SUCCESS;
 }
-
 
 error_code_e merge_sort(void* const array, const size_t size, comparator cmp) {
     assert(array != NULL);
@@ -287,11 +288,10 @@ int string_cmp(const void* const first_str, const void* const second_str) {
     assert( first_str != NULL);
     assert(second_str != NULL);
 
-    return my_strncmp(((string*)first_str)->text, ((string*)second_str)->text, MIN(((string*)first_str)->text_sz, ((string*)second_str)->text_sz));
+    return my_strncmp(((const string* const)first_str)->text, ((const string* const)second_str)->text, MIN(((const string* const)first_str)->text_sz, ((const string* const)second_str)->text_sz));
 }
 
-
-int int_cmp(const void* const first_element, const void* const second_element) {
+int int_cmp(const void* first_element, const void* second_element) {
     assert(first_element  != NULL);
     assert(second_element != NULL);
 
@@ -351,7 +351,6 @@ error_code_e test_bubble_sort() {
     return SUCCESS;
 }
 
-
 error_code_e test_selection_sort() {
     const size_t size_x = 5;
 
@@ -376,6 +375,20 @@ error_code_e test_selection_sort() {
     return SUCCESS;
 }
 
+error_code_e test_q_sort() {
+    const size_t size = 15;
+
+    int int_arr[size] = {6, 7, 3, 6, 9, 5, 8, 2, 10, 1, 4};
+
+    if ((LAST_ERROR_CODE = q_sort(int_arr, size, sizeof(int), int_cmp))) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    $print_int_arr(int_arr, size);
+
+    return SUCCESS;
+}
 
 error_code_e test_merge_sort() {
     const size_t size = 11;
@@ -418,5 +431,6 @@ error_code_e test_merge_sort() {
 
     return SUCCESS;
 }
+
 
 

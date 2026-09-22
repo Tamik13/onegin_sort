@@ -3,75 +3,125 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <ctype.h>
 
-
-
-error_code_e read_file                (string* const buffer);
+error_code_e command_line_processing  (int argc,                       char** argv,                       char** const input_file_name,       char** const output_file_name);
+error_code_e read_file                (string* const buffer,           const char* const input_file_name);
 error_code_e replace_slash_n          (string* const buffer,           size_t* const count_replace);
 error_code_e initialization_ptr_on_str(const string* const buffer,     string* const ptr_on_str);
-error_code_e writing_in_file          (const string* const ptr_on_str, const size_t count_strings);
+error_code_e clear_file               (const char*   const file_name);
+error_code_e writing_in_file          (const string* const ptr_on_str, const size_t count_strings,        const char* const output_file_name);
 
-
+int first_string_cmp (const void* const first_element, const void* const second_element);
+int second_string_cmp(const void* const first_element, const void* const second_element);
 
 static error_code_e LAST_ERROR_CODE = INIT_VALUE;
 
-const char*  INPUT_FILE_NAME =  "clear_onegin.txt";
-const char* OUTPUT_FILE_NAME = "sorted_onegin.txt";
+int main(int argc, char** argv) {
+    char*  input_file_name = NULL;
+    char* output_file_name = NULL;
+    string buffer = {};
+    size_t count_strings = 0;
+    string* ptr_on_str = NULL;
 
-int main() {
-//     string buffer = {};
-//     size_t count_strings = 0;
-//     string* ptr_on_str = NULL;
-//
-//     if ((LAST_ERROR_CODE = read_file(&buffer))                                != SUCCESS) {
+//     if ((LAST_ERROR_CODE = test_q_sort()) != SUCCESS) {
 //         PRINT_ERROR;
 //         return LAST_ERROR_CODE;
 //     }
 //
-//     if ((LAST_ERROR_CODE = replace_slash_n(&buffer, &count_strings))          != SUCCESS) {
-//         PRINT_ERROR;
-//         return LAST_ERROR_CODE;
-//     }
-//
-//     if ((ptr_on_str      = (string*)calloc(count_strings, sizeof(char**)))    == NULL) {
-//         LAST_ERROR_CODE = ERROR_IN_MEM_ALLOCATION;
-//         PRINT_ERROR;
-//         return LAST_ERROR_CODE;
-//     }
-//
-//     if ((LAST_ERROR_CODE = initialization_ptr_on_str(&buffer, ptr_on_str))    != SUCCESS) {
-//         PRINT_ERROR;
-//         return LAST_ERROR_CODE;
-//     }
-//
-//     // if ((LAST_ERROR_CODE = merge_sort(ptr_on_str, count_strings, string_cmp)) != SUCCESS) {
-//     //     PRINT_ERROR;
-//     //     return LAST_ERROR_CODE;
-//     // }
-//
-//     if ((LAST_ERROR_CODE = writing_in_file(ptr_on_str, count_strings))        != SUCCESS) {
-//         PRINT_ERROR;
-//         return LAST_ERROR_CODE;
-//     }
-    const size_t size = 20;
-    int array[size] = {1, 4, 10, 3, 7, 6, 2, 8, 9, 5};
+//     return SUCCESS;
 
-    $ANCHOR
+    if ((LAST_ERROR_CODE = command_line_processing(argc, argv, &input_file_name, &output_file_name))) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
 
-    q_sort(array, size, sizeof(int), int_cmp);
+    $string(input_file_name);
+    $string(output_file_name);
 
-    $print_int_arr(array, size);
+    if ((LAST_ERROR_CODE = read_file(&buffer, input_file_name))                          != SUCCESS) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    if ((LAST_ERROR_CODE = replace_slash_n(&buffer, &count_strings))                     != SUCCESS) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    if ((ptr_on_str      = (string*)calloc(count_strings, sizeof(char**)))               == NULL) {
+        LAST_ERROR_CODE = ERROR_IN_MEM_ALLOCATION;
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    if ((LAST_ERROR_CODE = initialization_ptr_on_str(&buffer, ptr_on_str))               != SUCCESS) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    if ((LAST_ERROR_CODE = q_sort(ptr_on_str,            count_strings,
+                                  sizeof(ptr_on_str[0]), first_string_cmp))              != SUCCESS) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    if ((LAST_ERROR_CODE = clear_file(output_file_name))                                 != SUCCESS) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    if ((LAST_ERROR_CODE = writing_in_file(ptr_on_str, count_strings, output_file_name)) != SUCCESS) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+
+    qsort(ptr_on_str, count_strings, sizeof(ptr_on_str[0]), second_string_cmp);
+
+
+    if ((LAST_ERROR_CODE = writing_in_file(ptr_on_str, count_strings, output_file_name)) != SUCCESS) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    if ((LAST_ERROR_CODE = writing_in_file(&buffer, 1, output_file_name))                != SUCCESS) {
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    printf(COLOR_TEXT("SUCCESS\n", GREEN));
 
     return 0;
 }
 
-error_code_e read_file(string* const buffer) {
+error_code_e command_line_processing(int argc, char** argv, char** const input_file_name, char** const output_file_name) {
+    assert(argv != NULL);
+
+    if (argc == 1) {
+        *input_file_name  = (char*)"clear_onegin.txt";
+        *output_file_name = (char*)"sorted_onegin.txt";
+        return SUCCESS;
+
+    } else if (argc != 3) {
+        LAST_ERROR_CODE = INCORRECT_ARGC;
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    *input_file_name  = argv[1];
+    *output_file_name = argv[2];
+
+    return SUCCESS;
+}
+
+error_code_e read_file(string* const buffer, const char* const input_file_name) {
     assert(buffer != NULL);
 
-    int input_file = open(INPUT_FILE_NAME, O_RDONLY);
+    int input_file = open(input_file_name, O_RDONLY);
     struct stat buff = {};
 
-    if (stat(INPUT_FILE_NAME, &buff) == -1) {
+    if (stat(input_file_name, &buff) == -1) {
         LAST_ERROR_CODE = STAT_READ_ERROR;
         PRINT_ERROR;
         return LAST_ERROR_CODE;
@@ -125,6 +175,10 @@ error_code_e initialization_ptr_on_str(const string* const buffer, string* ptr_o
     size_t number_ptr = 0;
     size_t size_str = 0;
 
+    if (buffer->text_sz == 0) {
+        return SUCCESS;
+    }
+
     ptr_on_str[number_ptr++].text = &buffer->text[0];
 
     for (size_t letter_ind = 1; letter_ind < (size_t)buffer->text_sz; letter_ind++) {
@@ -147,10 +201,29 @@ error_code_e initialization_ptr_on_str(const string* const buffer, string* ptr_o
     return SUCCESS;
 }
 
-error_code_e writing_in_file(const string* const ptr_on_str, const size_t count_strings) {
+error_code_e clear_file(const char* const FILE_NAME) {
+
+    int output_file = open(FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, S_IWRITE);
+
+    if (output_file == -1) {
+        LAST_ERROR_CODE = OPEN_FILE_ERROR;
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    if (close(output_file) == -1) {
+        LAST_ERROR_CODE = CLOSE_FILE_ERROR;
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
+    }
+
+    return SUCCESS;
+}
+
+error_code_e writing_in_file(const string* const ptr_on_str, const size_t count_strings, const char* const output_file_name) {
     assert(ptr_on_str != NULL);
 
-    int output_file = open(OUTPUT_FILE_NAME, O_RDWR | O_CREAT, S_IREAD | S_IWRITE);
+    int output_file = open(output_file_name, O_WRONLY | O_CREAT |  O_APPEND, S_IWRITE);
 
     if (output_file == -1) {
         LAST_ERROR_CODE = OPEN_FILE_ERROR;
@@ -168,11 +241,80 @@ error_code_e writing_in_file(const string* const ptr_on_str, const size_t count_
             PRINT_ERROR;
             return LAST_ERROR_CODE;
         }
+    }
 
-        printf("%s", ptr_on_str[string_ind].text);
+    if (close(output_file) == -1) {
+        LAST_ERROR_CODE = CLOSE_FILE_ERROR;
+        PRINT_ERROR;
+        return LAST_ERROR_CODE;
     }
 
     return SUCCESS;
 }
 
+int first_string_cmp(const void* const first_element, const void* const second_element) {
+    assert(first_element  != NULL);
+    assert(second_element != NULL);
 
+    const string* const first_str  = (const string* const)first_element;
+    const string* const second_str = (const string* const)second_element;
+
+    size_t  first_ind = 0;
+    size_t second_ind = 0;
+
+    while (first_ind < first_str->text_sz && first_str->text[first_ind]    != '\0' &&
+          second_ind < second_str->text_sz && second_str->text[second_ind] != '\0') {
+
+        while (first_ind < first_str->text_sz && !isalpha(first_str->text[first_ind]))     first_ind++;
+        while (second_ind < second_str->text_sz && !isalpha(second_str->text[second_ind])) second_ind++;
+
+        if(second_ind >= second_str->text_sz || first_ind >= first_str->text_sz) return 0;
+
+        if (first_str->text[first_ind] != second_str->text[second_ind]) {
+            return first_str->text[first_ind] - second_str->text[second_ind];
+        }
+
+        first_ind++; second_ind++;
+    }
+
+    return first_str->text[first_ind] - second_str->text[second_ind];
+}
+
+int second_string_cmp(const void* first_element, const void* second_element) {
+    assert(first_element  != NULL);
+    assert(second_element != NULL);
+
+    const string* const first_str  = (const string* const)first_element;
+    const string* const second_str = (const string* const)second_element;
+
+    long long  first_ind = (long long)(first_str->text_sz  - 1);
+    long long second_ind = (long long)(second_str->text_sz - 1);
+
+    while (first_ind >= 0 && first_str->text[first_ind]   != '\0' &&
+          second_ind >= 0 && second_str->text[second_ind] != '\0') {
+
+        // $ANCHOR
+
+        while (first_ind  >= 0 && !isalpha( first_str->text[first_ind]))  first_ind--;
+        // $ANCHOR
+        while (second_ind >= 0 && !isalpha(second_str->text[second_ind])) second_ind--;
+
+        // $ANCHOR
+
+        if(second_ind < 0 || first_ind < 0) return first_str->text[first_ind] - second_str->text[second_ind];
+
+        // $ANCHOR
+
+        if (first_str->text[first_ind] != second_str->text[second_ind]) {
+            return first_str->text[first_ind] - second_str->text[second_ind];
+        }
+
+        // $ANCHOR
+
+        first_ind--; second_ind--;
+    }
+
+    // $ANCHOR
+
+    return first_str->text[first_ind] - second_str->text[second_ind];
+}

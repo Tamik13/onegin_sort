@@ -50,5 +50,30 @@ void $print_intptr_arr(const int* const int_array[], const size_t size) {
     printf("\n");
 }
 
+void $debug_qsort(const int* array, const size_t size, const size_t left, const size_t right, void* middle_el, size_t type_size, const char* const reason) {
+    for (size_t num_ind = 0; num_ind < left; num_ind++) {
+        ASSERT_FOR_ARR(num_ind, size);
+
+        printf(COLOR_TEXT("%4d ", BLUE), *((const int* const)array + num_ind ));
+    }
+
+    for (size_t num_ind = left; num_ind <= right; num_ind++) {
+        ASSERT_FOR_ARR(num_ind, size);
+
+        printf("%4d ", *((const int* const)array + num_ind));
+    }
+
+    for (size_t num_ind = right + 1; num_ind < size; num_ind++) {
+        ASSERT_FOR_ARR(num_ind, size);
+
+        printf(COLOR_TEXT("%4d ", RED), *((const int* const)array + num_ind));
+    }
+
+
+    printf(COLOR_TEXT(" left = %zu right = %zu middle_el = %d  reason: %s", VIOLET) "\n",
+                        left,      right,*(int*)middle_el,             reason);
+
+    getchar();
+}
 
 

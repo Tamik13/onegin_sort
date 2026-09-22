@@ -4,7 +4,7 @@
 #include <string.h>
 #include "str_fun.h"
 
-typedef int (comparator)(const void* const first_element, const void* const second_element);
+typedef int (comparator)(const void* first_element, const void* second_element);
 
 #define MATRIX_IND(x, size_y) ((x) * (size_y))
 #define MANUAL_IND(block, arr) ((char* const)(arr) + (block))
@@ -15,7 +15,7 @@ error_code_e swap_all_strings     (char* first_str, char* second_str, const size
 error_code_e swap_with_ll_buffer  (char* first_str, char* second_str, const size_t size);
 
 
-error_code_e bubble_sort   (char* str_array,       const size_t size, const size_t size_y); // TODO проверка отсортированности
+error_code_e bubble_sort   (char* str_array,       const size_t size, const size_t size_y);
 error_code_e selection_sort(char* const str_array, const size_t size, const size_t size_y);
 error_code_e q_sort        (void* const array,     const size_t size, const size_t type_size, comparator cmp);
 error_code_e merge_sort    (void* const str_array, const size_t size, comparator cmp);
@@ -28,4 +28,5 @@ int int_cmp   (const void* const first_element, const void* const second_element
 
 error_code_e test_bubble_sort   ();
 error_code_e test_selection_sort();
+error_code_e test_q_sort        ();
 error_code_e test_merge_sort    ();
