@@ -299,6 +299,7 @@ int int_cmp(const void* first_element, const void* second_element) {
 }
 
 
+
 error_code_e test_bubble_sort() {
     const size_t size1_x = 5;
 
