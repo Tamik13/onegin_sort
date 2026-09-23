@@ -50,7 +50,7 @@ void $print_intptr_arr(const int* const int_array[], const size_t size) {
     printf("\n");
 }
 
-void $debug_qsort(const int* array, const size_t size, const size_t left, const size_t right, void* middle_el, size_t type_size, const char* const reason) {
+void $debug_qsort(const int* array, const size_t size, const size_t left, const size_t right, void* middle_el, const char* const reason) {
     for (size_t num_ind = 0; num_ind < left; num_ind++) {
         ASSERT_FOR_ARR(num_ind, size);
 

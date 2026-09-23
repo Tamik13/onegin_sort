@@ -82,7 +82,7 @@ enum error_code_e {
     INIT_VALUE               = -1
 };
 
-void $debug_qsort     (const int* array,             const size_t size,   const size_t left,      const size_t right,     void* middle_el,           size_t type_size, const char* const reason);
+void $debug_qsort     (const int* array,             const size_t size,   const size_t left,      const size_t right,     void* middle_el,           const char* const reason);
 void $print_arr       (const void* const arr,        const size_t size,   const size_t size_type, const char* const type, const char* const message);
 void $print_strptr_arr(const char* const arr[],      const size_t size);
 void $print_str_matrix(const char* const arr,        const size_t size_x, const size_t size_y);

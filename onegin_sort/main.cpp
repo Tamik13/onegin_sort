@@ -5,9 +5,9 @@
 #include <fcntl.h>
 #include <ctype.h>
 
-error_code_e command_line_processing  (int argc,                       char** argv,                       char** const input_file_name,       char** const output_file_name);
+error_code_e command_line_processing  (const int argc,                 const char*const*const argv,       const char** const input_file_name,      const char** const output_file_name);
 error_code_e read_file                (string* const buffer,           const char* const input_file_name);
-error_code_e replace_slash_n          (string* const buffer,           size_t* const count_replace);
+error_code_e count_slash_n            (string* const buffer,           size_t* const count_replace);
 error_code_e initialization_ptr_on_str(const string* const buffer,     string* const ptr_on_str);
 error_code_e clear_file               (const char*   const file_name);
 error_code_e writing_in_file          (const string* const ptr_on_str, const size_t count_strings,        const char* const output_file_name);
@@ -18,8 +18,8 @@ int second_string_cmp(const void* const first_element, const void* const second_
 static error_code_e LAST_ERROR_CODE = INIT_VALUE;
 
 int main(int argc, char** argv) {
-    char*  input_file_name = NULL;
-    char* output_file_name = NULL;
+    const char*  input_file_name = NULL;
+    const char* output_file_name = NULL;
     string buffer = {};
     size_t count_strings = 0;
     string* ptr_on_str = NULL;
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
         return LAST_ERROR_CODE;
     }
 
-    if ((LAST_ERROR_CODE = replace_slash_n(&buffer, &count_strings))                     != SUCCESS) {
+    if ((LAST_ERROR_CODE = count_slash_n(&buffer, &count_strings))                       != SUCCESS) {
         PRINT_ERROR;
         return LAST_ERROR_CODE;
     }
@@ -76,9 +76,7 @@ int main(int argc, char** argv) {
         return LAST_ERROR_CODE;
     }
 
-
     qsort(ptr_on_str, count_strings, sizeof(ptr_on_str[0]), second_string_cmp);
-
 
     if ((LAST_ERROR_CODE = writing_in_file(ptr_on_str, count_strings, output_file_name)) != SUCCESS) {
         PRINT_ERROR;
@@ -95,12 +93,12 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-error_code_e command_line_processing(int argc, char** argv, char** const input_file_name, char** const output_file_name) {
+error_code_e command_line_processing(const int argc, const char*const*const argv, const char** const input_file_name, const char** const output_file_name) {
     assert(argv != NULL);
 
     if (argc == 1) {
-        *input_file_name  = (char*)"clear_onegin.txt";
-        *output_file_name = (char*)"sorted_onegin.txt";
+        *input_file_name  = "clear_onegin.txt"; // TODO: разобраться с const
+        *output_file_name = "sorted_onegin.txt";
         return SUCCESS;
 
     } else if (argc != 3) {
@@ -129,7 +127,7 @@ error_code_e read_file(string* const buffer, const char* const input_file_name) 
 
     if ((buffer->text = (char*)calloc((size_t)buff.st_size, sizeof(char))) == NULL) {
         LAST_ERROR_CODE = ERROR_IN_MEM_ALLOCATION;
-        PRINT_ERROR;
+        PRINT_ERROR; // TODO: strerror
         return LAST_ERROR_CODE;
     }
 
@@ -139,7 +137,7 @@ error_code_e read_file(string* const buffer, const char* const input_file_name) 
         return LAST_ERROR_CODE;
     }
 
-    if ((buffer->text_sz = (size_t)read(input_file, buffer->text, (size_t)buff.st_size)) == (size_t)-1) {
+    if ((buffer->text_sz = (size_t)read(input_file, buffer->text, (size_t)buff.st_size) + 1) == (size_t)-1) {
         LAST_ERROR_CODE = ERROR_DURING_READING;
         PRINT_ERROR;
         return LAST_ERROR_CODE;
@@ -154,14 +152,13 @@ error_code_e read_file(string* const buffer, const char* const input_file_name) 
     return SUCCESS;
 }
 
-error_code_e replace_slash_n(string* const buffer, size_t* const count_replace) {
+error_code_e count_slash_n(string* const buffer, size_t* const count_str) {
     assert(buffer != NULL);
 
     for (size_t letter_ind = 0; letter_ind < buffer->text_sz; letter_ind++) {
         ASSERT_FOR_ARR(letter_ind, buffer->text_sz);
-        if (buffer->text[letter_ind] == '\n') {
-            buffer->text[letter_ind] = '\0';
-            (*count_replace)++;
+        if (buffer->text[letter_ind] == '\n') { // TODO: \0 поправить
+            (*count_str)++;
         }
     }
 
@@ -184,7 +181,7 @@ error_code_e initialization_ptr_on_str(const string* const buffer, string* ptr_o
     for (size_t letter_ind = 1; letter_ind < (size_t)buffer->text_sz; letter_ind++) {
         ASSERT_FOR_ARR(letter_ind - 1, buffer->text_sz);
 
-        if (buffer->text[letter_ind - 1] == '\0') {
+        if (buffer->text[letter_ind - 1] == '\n') {
             ASSERT_FOR_ARR(letter_ind, buffer->text_sz);
 
             ptr_on_str[number_ptr].text    = &buffer->text[letter_ind];
@@ -256,21 +253,30 @@ int first_string_cmp(const void* const first_element, const void* const second_e
     assert(first_element  != NULL);
     assert(second_element != NULL);
 
+    // $ANCHOR
+
     const string* const first_str  = (const string* const)first_element;
     const string* const second_str = (const string* const)second_element;
+
+//     $size_t(first_str->text_sz);
+//     $ptr(second_str);
+//
+//     $ANCHOR
 
     size_t  first_ind = 0;
     size_t second_ind = 0;
 
-    while (first_ind < first_str->text_sz && first_str->text[first_ind]    != '\0' &&
-          second_ind < second_str->text_sz && second_str->text[second_ind] != '\0') {
+    while (first_ind <  first_str->text_sz &&  first_str->text[first_ind]  != '\n' &&
+          second_ind < second_str->text_sz && second_str->text[second_ind] != '\n') {
+
+        // $ANCHOR
 
         while (first_ind < first_str->text_sz && !isalpha(first_str->text[first_ind]))     first_ind++;
         while (second_ind < second_str->text_sz && !isalpha(second_str->text[second_ind])) second_ind++;
 
         if(second_ind >= second_str->text_sz || first_ind >= first_str->text_sz) return 0;
 
-        if (first_str->text[first_ind] != second_str->text[second_ind]) {
+        if (first_str->text[first_ind] - second_str->text[second_ind] != 0) {
             return first_str->text[first_ind] - second_str->text[second_ind];
         }
 
@@ -290,8 +296,8 @@ int second_string_cmp(const void* first_element, const void* second_element) {
     long long  first_ind = (long long)(first_str->text_sz  - 1);
     long long second_ind = (long long)(second_str->text_sz - 1);
 
-    while (first_ind >= 0 && first_str->text[first_ind]   != '\0' &&
-          second_ind >= 0 && second_str->text[second_ind] != '\0') {
+    while (first_ind >= 0 && first_str->text[first_ind]   != '\n' &&
+          second_ind >= 0 && second_str->text[second_ind] != '\n') {
 
         // $ANCHOR
 
@@ -305,7 +311,7 @@ int second_string_cmp(const void* first_element, const void* second_element) {
 
         // $ANCHOR
 
-        if (first_str->text[first_ind] != second_str->text[second_ind]) {
+        if (first_str->text[first_ind] - second_str->text[second_ind] != 0) {
             return first_str->text[first_ind] - second_str->text[second_ind];
         }
 
