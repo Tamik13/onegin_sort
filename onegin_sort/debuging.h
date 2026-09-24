@@ -3,7 +3,7 @@
 #include <errno.h>
 
 #define PRINT_ERROR    \
-    fprintf(stderr, "%s:%d " COLOR_TEXT("ERROR CODE: ", RED) "%d   " COLOR_TEXT("ERRNO CODE: ", RED) "%d  %s\n",  __FILE__, __LINE__, LAST_ERROR_CODE, errno, __FUNCTION__);
+    fprintf(stderr, "%s:%d " COLOR_TEXT("ERROR CODE: ", RED) "%d   " COLOR_TEXT("ERRNO: ", RED) "%s  %s\n",  __FILE__, __LINE__, LAST_ERROR_CODE, strerror(errno), __FUNCTION__);
 
 #define ASSERT_FOR_ARR(ind, size) assert(0 <= (size_t)ind && (size_t)ind < (size_t)size);
 

@@ -5,6 +5,17 @@
 #include <fcntl.h>
 #include <ctype.h>
 
+#define STAT_GET_SIZE(file_size) \
+    struct stat buff = {};                      \
+                                                \
+    if (stat(input_file_name, &buff) == -1) {   \
+        LAST_ERROR_CODE = STAT_READ_ERROR;      \
+        PRINT_ERROR;                            \
+        return LAST_ERROR_CODE;                 \
+    }                                           \
+                                                \
+    file_size = (size_t)buff.st_size;
+
 error_code_e command_line_processing  (const int argc,                 const char*const*const argv,       const char** const input_file_name,      const char** const output_file_name);
 error_code_e read_file                (string* const buffer,           const char* const input_file_name);
 error_code_e count_slash_n            (string* const buffer,           size_t* const count_replace);
@@ -17,7 +28,7 @@ int second_string_cmp(const void* const first_element, const void* const second_
 
 static error_code_e LAST_ERROR_CODE = INIT_VALUE;
 
-int main(int argc, char** argv) {
+int main(const int argc, const char*const*const argv) {
     const char*  input_file_name = NULL;
     const char* output_file_name = NULL;
     string buffer = {};
@@ -36,8 +47,8 @@ int main(int argc, char** argv) {
         return LAST_ERROR_CODE;
     }
 
-    $string(input_file_name);
-    $string(output_file_name);
+    // $string(input_file_name);
+    // $string(output_file_name);
 
     if ((LAST_ERROR_CODE = read_file(&buffer, input_file_name))                          != SUCCESS) {
         PRINT_ERROR;
@@ -97,7 +108,7 @@ error_code_e command_line_processing(const int argc, const char*const*const argv
     assert(argv != NULL);
 
     if (argc == 1) {
-        *input_file_name  = "clear_onegin.txt"; // TODO: разобраться с const
+        *input_file_name  = "clear_onegin.txt";  // TODO: разобраться с const
         *output_file_name = "sorted_onegin.txt";
         return SUCCESS;
 
@@ -117,15 +128,11 @@ error_code_e read_file(string* const buffer, const char* const input_file_name) 
     assert(buffer != NULL);
 
     int input_file = open(input_file_name, O_RDONLY);
-    struct stat buff = {};
+    size_t size_input_file;
 
-    if (stat(input_file_name, &buff) == -1) {
-        LAST_ERROR_CODE = STAT_READ_ERROR;
-        PRINT_ERROR;
-        return LAST_ERROR_CODE;
-    }
+    STAT_GET_SIZE(size_input_file); // TODO Define stat
 
-    if ((buffer->text = (char*)calloc((size_t)buff.st_size, sizeof(char))) == NULL) {
+    if ((buffer->text = (char*)calloc(size_input_file, sizeof(char))) == NULL) {
         LAST_ERROR_CODE = ERROR_IN_MEM_ALLOCATION;
         PRINT_ERROR; // TODO: strerror
         return LAST_ERROR_CODE;
