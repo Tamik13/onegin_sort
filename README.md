@@ -1,6 +1,6 @@
 # <a name="краткое_описание"></a>Onegin sort
 
-> WARNING
+> WARNING!!!
 Данная программа НЕ КОПИРУЕТ великое произведение мировой литературы - "Евгений Онегин" Александа Сергеевича Пушкина, а лишь ссылается на него ^^
 
 Этот репозиторий содержит написанную в учебных целях программу сортировки текстовых файлов(в частности роман А. С Пушкина - Евгений Онегин). Программа создает файл в который записывает три версии текста: отсортированную, отсортированную от конца к началу и оригинальный текст.
@@ -15,6 +15,7 @@
 * [Описание устройства программы](#Описание_устройства_программы)
     * [main](#Описание_устройства_программы/main)
     * [debugging](#Описание_устройства_программы/debugging)
+    * [string_sort](#Описание_устройства_программы/string_sort)
 ---
 
 ## <a name="запуск"></a>Запуск
@@ -222,5 +223,114 @@ Enum ошибок возвращаемых большинством самопи
 
 ---
 
-## string_sort
+## <a name="Описание_устройства_программы/string_sort"></a>string_sort
+
+Файл содержащий различные сортировки
+
+---
+
+```cpp
+error_code_e swap_symbol_by_symbol(char* first_str, char* second_str, const size_t size)
+```
+
+Функция меняющая две переменные first_str и second_str размера size значениями побайтово.
+
+---
+
+```cpp
+error_code_e swap_all_strings(char* first_str, char* second_str, const size_t size);
+```
+
+Функция меняющая две переменные first_str и second_str размера size значениями через отдельный буфер.
+
+---
+
+```cpp
+error_code_e swap_with_ll_buffer(char* first_str, char* second_str, const size_t size);
+```
+
+Функция меняющая две переменные first_str и second_str размера size значениями пакетами до 8 байт.
+
+---
+
+```cpp
+
+error_code_e bubble_sort(char* str_array, const size_t size_x, const size_t size_y);
+```
+
+Функция сортировки массива строк str_array размером size_x на size_y пузырьком.
+
+---
+
+```cpp
+error_code_e selection_sort(char* const str_array, const size_t size_x, const size_t size_y);
+```
+Функция сортировки массива строк str_array размером size_x на size_y выбором.
+
+---
+
+```cpp
+error_code_e q_sort(void* const array, const size_t size, const size_t type_size, comparator cmp);
+```
+
+Алгоритм быстрой сортировки, для любого типа.
+Принимает на вход сортируемый массив в виде void*, размер массива, размер сортируемого типа и указатель на функцию comparator - правило сравнения элементов
+
+<a name="comparator"></a> Определение функции вида comparator:
+
+
+```cpp
+typedef int (comparator)(const void* first_element, const void* second_element);
+```
+
+---
+
+```cpp
+error_code_e merge_sort(void* const str_array, const size_t size, comparator cmp);
+```
+
+Алгоритм сортировки слиянием, для указателей на указатели. На вход принимает сортируемый массив в виде void*, размер массива и указатель на функцию вида comparator - правило сравнения элементов.
+
+---
+
+```cpp
+error_code_e merge(const void* const first_arr, const size_t first_size, const void* const second_arr, const size_t second_size, void* const result_arr, const size_t result_size, comparator cmp);
+```
+
+Функция слияния двух отсортированных массивов в один отсортированный. На вход принимает два массива в виде void*,
+
+
+---
+
+```cpp
+error_code_e copy_arr(const void* const lhs, const void* const rhs, const size_t size);
+```
+
+Функция копирования массива rhs указателей размера size в массив lhs
+
+---
+
+```cpp
+int string_cmp(const void* const first_str, const void* const second_str);
+```
+
+Компаратор вида [comparator](#comparator), сравнивающий две строки в лексикографическом порядке.
+
+---
+
+```cpp
+int int_cmp(const void* const first_element, const void* const second_element);
+```
+
+Компаратор вида [comparator](#comparator), сравнивающий два числа типа int.
+
+```cpp
+error_code_e test_bubble_sort   ();
+error_code_e test_selection_sort();
+error_code_e test_q_sort        ();
+error_code_e test_merge_sort    ();
+```
+
+Функции для проверки работы сортировок.
+
 

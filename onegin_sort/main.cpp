@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include <ctype.h>
 
-#define STAT_GET_SIZE(file_size) \
+#define STAT_GET_SIZE(file_size)                \
     struct stat buff = {};                      \
                                                 \
     if (stat(input_file_name, &buff) == -1) {   \
@@ -104,11 +104,11 @@ int main(const int argc, const char*const*const argv) {
     return 0;
 }
 
-error_code_e command_line_processing(const int argc, const char*const*const argv, const char** const input_file_name, const char** const output_file_name) {
+error_code_e command_line_processing(const int argc, const char * const * const argv, const char** const input_file_name, const char** const output_file_name) {
     assert(argv != NULL);
 
     if (argc == 1) {
-        *input_file_name  = "clear_onegin.txt";  // TODO: разобраться с const
+        *input_file_name  = "clear_onegin.txt";  // TODO: разобраться с const DONE
         *output_file_name = "sorted_onegin.txt";
         return SUCCESS;
 
@@ -128,13 +128,13 @@ error_code_e read_file(string* const buffer, const char* const input_file_name) 
     assert(buffer != NULL);
 
     int input_file = open(input_file_name, O_RDONLY);
-    size_t size_input_file;
+    size_t size_input_file = 0; // TODO проверить неинит перем
 
-    STAT_GET_SIZE(size_input_file); // TODO Define stat
+    STAT_GET_SIZE(size_input_file); // TODO FUNCTION STAT
 
     if ((buffer->text = (char*)calloc(size_input_file, sizeof(char))) == NULL) {
         LAST_ERROR_CODE = ERROR_IN_MEM_ALLOCATION;
-        PRINT_ERROR; // TODO: strerror
+        PRINT_ERROR; // TODO: strerror DONE
         return LAST_ERROR_CODE;
     }
 
