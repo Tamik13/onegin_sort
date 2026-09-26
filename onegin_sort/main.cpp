@@ -207,7 +207,7 @@ error_code_e initialization_ptr_on_str(const string* const buffer, string* ptr_o
 
 error_code_e clear_file(const char* const FILE_NAME) {
 
-    int output_file = open(FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, S_IWRITE);
+    int output_file = open(FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
 
     if (output_file == -1) {
         LAST_ERROR_CODE = OPEN_FILE_ERROR;
@@ -227,7 +227,7 @@ error_code_e clear_file(const char* const FILE_NAME) {
 error_code_e writing_in_file(const string* const ptr_on_str, const size_t count_strings, const char* const output_file_name) {
     assert(ptr_on_str != NULL);
 
-    int output_file = open(output_file_name, O_WRONLY | O_CREAT |  O_APPEND, S_IWRITE);
+    int output_file = open(output_file_name, O_WRONLY | O_CREAT |  O_APPEND, S_IREAD | S_IWRITE);
 
     if (output_file == -1) {
         LAST_ERROR_CODE = OPEN_FILE_ERROR;
